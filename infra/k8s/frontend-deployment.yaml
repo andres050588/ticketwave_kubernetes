@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: ticketwave-frontend
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: ticketwave-frontend
+    template:
+        metadata:
+            labels:
+                app: ticketwave-frontend
+        spec:
+            containers:
+                - name: ticketwave-frontend
+                  image: your-dockerhub-username/ticketwave_frontend:latest
+                  ports:
+                      - containerPort: 80
+                  resources:
+                      requests:
+                          memory: "128Mi"
+                          cpu: "100m"
+                      limits:
+                          memory: "256Mi"
+                          cpu: "250m"

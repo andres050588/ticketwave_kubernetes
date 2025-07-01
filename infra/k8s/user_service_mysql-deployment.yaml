@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: user-mysql
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: user-mysql
+    template:
+        metadata:
+            labels:
+                app: user-mysql
+        spec:
+            containers:
+                - name: user-mysql
+                  image: mysql:8
+                  env:
+                      - name: MYSQL_ROOT_PASSWORD
+                        value: rootpass
+                      - name: MYSQL_DATABASE
+                        value: user_service_db
+                  resources:
+                      requests:
+                          memory: "128Mi"
+                          cpu: "100m"
+                      limits:
+                          memory: "256Mi"
+                          cpu: "250m"
+                  ports:
+                      - containerPort: 3306
+                  volumeMounts:
+                      - name: user-mysql-pvc
+                        mountPath: /var/lib/mysql
+            volumes:
+                - name: user-mysql-pvc
+                  persistentVolumeClaim:
+                      claimName: user-mysql-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: user-mysql-pvc
+spec:
+    accessModes:
+        - ReadWriteOnce
+    resources:
+        requests:
+            storage: 1Gi
+---
+

@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: redisapi-service
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: redisapi-service
+    template:
+        metadata:
+            labels:
+                app: redisapi-service
+        spec:
+            containers:
+                - name: redisapi-service
+                  image: andres050588/redisapi-service:latest
+                  env:
+                      - name: REDIS_HOST
+                        value: redis
+                      - name: REDIS_PORT
+                        value: "6379"
+                      - name: REDIS_PASSWORD
+                        valueFrom:
+                            secretKeyRef:
+                                name: redis-secret
+                                key: redis-password
+                  resources:
+                      requests:
+                          memory: "64Mi"
+                          cpu: "50m"
+                      limits:
+                          memory: "128Mi"
+                          cpu: "100m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: redisapi-service
+spec:
+    selector:
+        app: redisapi-service
+    ports:
+        - protocol: TCP
+          port: 3004
+          targetPort: 3004

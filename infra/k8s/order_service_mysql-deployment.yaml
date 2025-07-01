@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: order-mysql
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: order-mysql
+    template:
+        metadata:
+            labels:
+                app: order-mysql
+        spec:
+            containers:
+                - name: order-mysql
+                  image: mysql:8
+                  env:
+                      - name: MYSQL_ROOT_PASSWORD
+                        value: rootpass
+                      - name: MYSQL_DATABASE
+                        value: order_service_db
+                  resources:
+                      requests:
+                          memory: "128Mi"
+                          cpu: "100m"
+                      limits:
+                          memory: "256Mi"
+                          cpu: "250m"
+                  ports:
+                      - containerPort: 3306
+                  volumeMounts:
+                      - name: order-mysql-pvc
+                        mountPath: /var/lib/mysql
+            volumes:
+                - name: order-mysql-pvc
+                  persistentVolumeClaim:
+                      claimName: order-mysql-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: order-mysql-pvc
+spec:
+    accessModes:
+        - ReadWriteOnce
+    resources:
+        requests:
+            storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: order-mysql
+spec:
+    type: ClusterIP
+    selector:
+        app: order-mysql
+    ports:
+        - protocol: TCP
+          port: 3306
+          targetPort: 3306

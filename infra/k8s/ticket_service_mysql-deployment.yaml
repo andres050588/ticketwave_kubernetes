@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: ticket-mysql
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: ticket-mysql
+    template:
+        metadata:
+            labels:
+                app: ticket-mysql
+        spec:
+            containers:
+                - name: ticket-mysql
+                  image: mysql:8
+                  env:
+                      - name: MYSQL_ROOT_PASSWORD
+                        value: rootpass
+                      - name: MYSQL_DATABASE
+                        value: ticket_service_db
+                  resources:
+                      requests:
+                          memory: "128Mi"
+                          cpu: "100m"
+                      limits:
+                          memory: "256Mi"
+                          cpu: "250m"
+                  ports:
+                      - containerPort: 3306
+                  volumeMounts:
+                      - name: ticket-mysql-pvc
+                        mountPath: /var/lib/mysql
+            volumes:
+                - name: ticket-mysql-pvc
+                  persistentVolumeClaim:
+                      claimName: ticket-mysql-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: ticket-mysql-pvc
+spec:
+    accessModes:
+        - ReadWriteOnce
+    resources:
+        requests:
+            storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: ticket-mysql
+spec:
+    type: ClusterIP
+    selector:
+        app: ticket-mysql
+    ports:
+        - protocol: TCP
+          port: 3306
+          targetPort: 3306
