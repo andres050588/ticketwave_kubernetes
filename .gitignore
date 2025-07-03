@@ -14,11 +14,4 @@ logs/
 
 # Docker
 *.local
-docker-compose.override.yml/order_service/.git
-/order_service_db/.git
-/redisAPI_service/.git
-/ticket_service/.git
-/ticket_service_db/.git
-/ticketwave_frontend/.git
-/user_service/.git
-/user_service_db/.git
+docker-compose.yaml
