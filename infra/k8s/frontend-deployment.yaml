@@ -14,7 +14,7 @@ spec:
         spec:
             containers:
                 - name: ticketwave-frontend
-                  image: your-dockerhub-username/ticketwave_frontend:latest
+                  image: andres050588/ticketwave_frontend:latest
                   ports:
                       - containerPort: 80
                   resources:
@@ -24,3 +24,17 @@ spec:
                       limits:
                           memory: "256Mi"
                           cpu: "250m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: ticketwave-frontend
+spec:
+    selector:
+        app: ticketwave-frontend
+    type: LoadBalancer
+    ports:
+        - protocol: TCP
+          port: 80
+          targetPort: 80

@@ -14,9 +14,58 @@ spec:
         spec:
             containers:
                 - name: ticket-service
-                  image: your-dockerhub-username/ticket_service:latest
+                  image: andres050588/ticket_service:v3
+                  imagePullPolicy: Always
                   ports:
                       - containerPort: 3002
+                  env:
+                      - name: PORT
+                        value: "3002"
+                      - name: DB_HOST
+                        value: ticket-mysql
+                      - name: DB_PORT
+                        value: "3306"
+                      - name: DB_NAME
+                        value: ticket_service_db
+                      - name: DB_USER
+                        valueFrom:
+                            secretKeyRef:
+                                name: app-secrets
+                                key: DB_USER
+                      - name: DB_PASSWORD
+                        valueFrom:
+                            secretKeyRef:
+                                name: app-secrets
+                                key: DB_PASSWORD
+                      - name: JWT_SECRET
+                        valueFrom:
+                            secretKeyRef:
+                                name: app-secrets
+                                key: JWT_SECRET
+                      - name: REDIS_HOST
+                        value: redis
+                      - name: REDIS_PORT
+                        value: "6379"
+                      - name: REDIS_PASSWORD
+                        valueFrom:
+                            secretKeyRef:
+                                name: app-secrets
+                                key: REDIS_PASSWORD
+                      - name: CLOUD_NAME
+                        valueFrom:
+                            secretKeyRef:
+                                name: app-secrets
+                                key: CLOUD_NAME
+                      - name: CLOUD_API_KEY
+                        valueFrom:
+                            secretKeyRef:
+                                name: app-secrets
+                                key: CLOUD_API_KEY
+                      - name: CLOUD_API_SECRET
+                        valueFrom:
+                            secretKeyRef:
+                                name: app-secrets
+                                key: CLOUD_API_SECRET
                   resources:
                       requests:
                           memory: "128Mi"
@@ -24,3 +73,17 @@ spec:
                       limits:
                           memory: "256Mi"
                           cpu: "250m"
+---
+# --- Service ---
+apiVersion: v1
+kind: Service
+metadata:
+    name: ticket-service
+spec:
+    selector:
+        app: ticket-service
+    ports:
+        - protocol: TCP
+          port: 3002
+          targetPort: 3002
+    type: ClusterIP

@@ -22,11 +22,11 @@ spec:
                         value: order_service_db
                   resources:
                       requests:
-                          memory: "128Mi"
-                          cpu: "100m"
-                      limits:
-                          memory: "256Mi"
+                          memory: "512Mi"
                           cpu: "250m"
+                      limits:
+                          memory: "1Gi"
+                          cpu: "500m"
                   ports:
                       - containerPort: 3306
                   volumeMounts:

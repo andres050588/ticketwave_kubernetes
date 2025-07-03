@@ -14,7 +14,7 @@ spec:
         spec:
             containers:
                 - name: ticket-mysql
-                  image: mysql:8
+                  image: mysql:8.0
                   env:
                       - name: MYSQL_ROOT_PASSWORD
                         value: rootpass
@@ -22,10 +22,10 @@ spec:
                         value: ticket_service_db
                   resources:
                       requests:
-                          memory: "128Mi"
+                          memory: "256Mi"
                           cpu: "100m"
                       limits:
-                          memory: "256Mi"
+                          memory: "512Mi"
                           cpu: "250m"
                   ports:
                       - containerPort: 3306
