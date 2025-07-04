@@ -9,7 +9,7 @@ import checkExpiredOrders from "./cron/checkExpiredOrders.js"
 
 const app = express()
 
-const whiteList = ["http://localhost:8080", "https://ticketwave-kubernetes.vercel.app"]
+const whiteList = ["http://localhost:8080", "http://35.195.241.8", "https://ticketwave-kubernetes.vercel.app"]
 
 app.use(
     cors({

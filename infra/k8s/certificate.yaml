@@ -1,0 +1,20 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+    name: ticketwave-tls-cert
+    namespace: default
+spec:
+    secretName: ticketwave-tls-secret-n4qbs
+    issuerRef:
+        name: letsencrypt-prod
+        kind: ClusterIssuer
+    commonName: ticketwave-kubernetes.vercel.app
+    dnsNames:
+        - ticketwave-kubernetes.vercel.app
+    privateKey:
+        algorithm: RSA
+        size: 2048
+    usages:
+        - digital signature
+        - key encipherment
+        - server auth

@@ -8,7 +8,7 @@ import "./events/subscriber.js"
 const app = express()
 
 // Middleware
-const whiteList = ["http://localhost:8080", "https://ticketwave-kubernetes.vercel.app"]
+const whiteList = ["http://localhost:8080", "http://35.195.241.8", "https://ticketwave-kubernetes.vercel.app"]
 
 app.use(
     cors({
@@ -23,7 +23,8 @@ app.options(
         credentials: true
     })
 )
-app.use(express.json())
+app.use(express.json({ limit: "10mb" }))
+app.use(express.urlencoded({ limit: "10mb", extended: true }))
 
 // Routes
 app.use("/api", routerTicket)

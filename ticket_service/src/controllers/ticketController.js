@@ -1,5 +1,6 @@
 import Ticket from "../models/ticketModel.js"
 import redis from "../redisClient.js"
+import { Op } from "sequelize"
 
 // CREAZIONE DI UN BIGLIETTO
 export const createTicket = async (req, res) => {
@@ -283,7 +284,12 @@ export const getTicketsBySeller = async (req, res) => {
         const { userId } = req.params
         console.log("📩 userId ricevuto dal path:", userId)
         const tickets = await Ticket.findAll({
-            where: { userId },
+            where: {
+                userId,
+                status: {
+                    [Op.ne]: "acquistato"
+                }
+            },
             order: [["createdAt", "DESC"]]
         })
 
