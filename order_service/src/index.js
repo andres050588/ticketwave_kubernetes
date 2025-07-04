@@ -13,15 +13,7 @@ const whiteList = ["http://localhost:8080", "https://ticketwave-kubernetes.verce
 
 app.use(
     cors({
-        origin: function (origin, callback) {
-            // Per richieste senza origin (Postman)
-            if (!origin) return callback(null, true)
-            if (whiteList.indexOf(origin) === -1) {
-                const msg = "CORS policy: Origine non autorizzata."
-                return callback(new Error(msg), false)
-            }
-            return callback(null, true)
-        },
+        origin: true,
         credentials: true
     })
 )
