@@ -8,16 +8,26 @@ import "./events/subscriber.js"
 const app = express()
 
 // Middleware
+const whiteList = ["http://localhost:8080", "https://ticketwave-kubernetes.vercel.app"]
+
 app.use(
     cors({
-        origin: "http://localhost:8080",
+        origin: function (origin, callback) {
+            // Per richieste senza origin (Postman)
+            if (!origin) return callback(null, true)
+            if (whiteList.indexOf(origin) === -1) {
+                const msg = "CORS policy: Origine non autorizzata."
+                return callback(new Error(msg), false)
+            }
+            return callback(null, true)
+        },
         credentials: true
     })
 )
 app.options(
     "*",
     cors({
-        origin: "http://localhost:8080",
+        origin: whiteList,
         credentials: true
     })
 )
