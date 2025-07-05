@@ -203,3 +203,75 @@ export const usersList_ByAdmin = async (request, response) => {
         return response.status(500).json({ error: "Errore server" })
     }
 }
+
+//_______________----------____________------------__________
+
+export const updateUserProfile_ByAdmin = async (request, response) => {
+    try {
+        const userToUpdateID = request.params.id
+        const userToUpdate = await User.findByPk(userToUpdateID)
+        if (!userToUpdate) return response.status(404).json({ error: "Utente da aggiornare non trovato" })
+
+        const { name, email, isAdmin } = request.body
+        const wasAdmin = userToUpdate.isAdmin
+
+        if (name) {
+            userToUpdate.name = name
+        }
+        if (email) {
+            userToUpdate.email = email
+        }
+        if (typeof isAdmin === "boolean") {
+            userToUpdate.isAdmin = isAdmin
+        }
+
+        let messages = []
+
+        if (wasAdmin !== isAdmin) {
+            messages.push(`Privilegi admin cambiati da ADMIN: ${wasAdmin} in ADMIN: ${isAdmin}`)
+        }
+
+        if (name || email) {
+            messages.push("Nome/email aggiornati")
+        }
+
+        if (messages.length === 0) {
+            return response.status(200).json({ message: "Nessun cambiamento effettuato" })
+        }
+
+        await userToUpdate.save()
+
+        return response.status(200).json({
+            message: messages.join(". "),
+            user: {
+                id: userToUpdate.id,
+                name: userToUpdate.name,
+                isAdmin: userToUpdate.isAdmin
+            }
+        })
+    } catch (error) {
+        console.error("Errore nel aggiornamento profilo da parte di Admin")
+        return response.status(500).json({ error: "Errore server" })
+    }
+}
+
+export const deleteUser_ByAdmin = async (request, response) => {
+    try {
+        const userToDeleId = request.params.id
+        const confirmationText = request.body.confirmationText
+        if (confirmationText !== "confermo cancellazione") {
+            return response.status(400).json({ error: "Per cancellare, scrivi 'conferma cancellazione'" })
+        }
+
+        const userToDelete = await User.findByPk(userToDeleId)
+        if (!userToDelete) {
+            console.error("Utente per cancellare non trovato")
+            return response.status(404).json({ error: "Utente per cancellare non trovato" })
+        }
+        await User.destroy({ where: { id: userToDeleId } })
+        return response.status(200).json({ message: "Utente eliminato con successo" })
+    } catch (error) {
+        console.error("Errore nela cancellazione utente", error)
+        return response.status(500).json({ error: "Errore server" })
+    }
+}
