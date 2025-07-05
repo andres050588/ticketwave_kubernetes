@@ -120,6 +120,38 @@ export const getUserOrders = async (req, res) => {
     }
 }
 
+// MOSTRA BIGLIETTI ACQUISTATI
+export const getPurchasedTickets = async (req, res) => {
+    try {
+        const userId = req.user.userId
+
+        // Trova gli ordini acquistati
+        const purchasedOrders = await Order.findAll({
+            where: { userId, status: "acquistato" },
+            order: [["createdAt", "DESC"]]
+        })
+
+        // Recupera dati biglietti da Redis per ogni ordine
+        const purchasedTickets = await Promise.all(
+            purchasedOrders.map(async order => {
+                const ticketData = await redis.get(`ticket:${order.ticketId}`)
+                let ticket = null
+                try {
+                    ticket = ticketData ? JSON.parse(ticketData) : null
+                } catch (e) {
+                    console.error("Errore parsing JSON del ticket:", e)
+                }
+                return ticket
+            })
+        )
+
+        res.json(purchasedTickets.filter(t => t !== null))
+    } catch (error) {
+        console.error("Errore nel recupero biglietti acquistati:", error)
+        res.status(500).json({ error: "Errore interno del server" })
+    }
+}
+
 // ANNULLA ORDINE
 export const cancelOrder = async (req, res) => {
     try {

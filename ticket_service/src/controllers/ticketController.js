@@ -211,18 +211,22 @@ export const getTicketById = async (req, res) => {
     }
 }
 
-// BIGLIETTI DELL’UTENTE LOGGATO
 export const getMyTickets = async (req, res) => {
     try {
         const userId = req.user.userId
 
-        const myTickets = await Ticket.findAll({
-            where: { userId },
+        const tickets = await Ticket.findAll({
+            where: {
+                userId,
+                status: {
+                    [Op.ne]: "acquistato"
+                }
+            },
             order: [["createdAt", "DESC"]]
         })
 
         const ticketsArricchiti = await Promise.all(
-            myTickets.map(async ticket => {
+            tickets.map(async ticket => {
                 let seller = null
                 let fallback = false
 
@@ -277,7 +281,6 @@ export const getMyTickets = async (req, res) => {
         res.status(500).json({ error: "Errore del server" })
     }
 }
-
 // LISTA DEI BIGLIETTI PER UTENTE
 export const getTicketsBySeller = async (req, res) => {
     try {
@@ -379,6 +382,7 @@ export const deleteTicket = async (request, response) => {
                 reason: "deleted_by_owner"
             })
         )
+        console.log(`Biglietto ${ticketId} cancellato da utente ${userId}${isAdmin ? " (admin)" : ""}`)
 
         return response.json({ message: "Biglietto cancellato con successo" })
     } catch (error) {
