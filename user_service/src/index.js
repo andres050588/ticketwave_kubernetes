@@ -39,7 +39,7 @@ async function startServer(retry = MAX_RETRY) {
         })
     } catch (error) {
         if (retry > 0) {
-            console.log(`Riprovo a connettermi..... Tentativi rimasti: ${retry}`)
+            console.log(`Riprovo a connettermi...... Tentativi rimasti: ${retry}`)
             setTimeout(() => startServer(retry - 1), 5000)
         } else {
             console.error("Impossibile connettersi al db dopo vari tentativi.")

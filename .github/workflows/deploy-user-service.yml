@@ -26,7 +26,7 @@ jobs:
                   username: ${{ secrets.DOCKER_USERNAME }}
                   password: ${{ secrets.DOCKER_PASSWORD }}
 
-            - name: Build and Push Docker Image
+            - name: 🛠️ Build and Push Docker Image
               run: |
                   docker buildx build \
                     --platform linux/amd64 \
@@ -34,28 +34,24 @@ jobs:
                     -t $IMAGE_NAME:${{ github.sha }} \
                     --push ./user_service
 
-            # ✅ Autenticazione prima del setup
-            - name: Authenticate to Google Cloud
+            #  Autenticazione GCP prima di usare il gcloud SDK
+            - name: 🔑 Authenticate to Google Cloud
               uses: google-github-actions/auth@v2
               with:
                   credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-            - name: Setup Google Cloud SDK
+            - name: ☁️ Setup Google Cloud SDK
               uses: google-github-actions/setup-gcloud@v2
               with:
                   project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-            # ✅ Debug temporaneo
-            - name: 🔍 Debug Secrets (solo temporaneo)
+            # Installazione plugin gke-gcloud-auth (deve essere PRIMA di usare kubectl)
+            - name: Install GKE Auth Plugin
               run: |
-                  echo "PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}"
-                  echo "GKE_CLUSTER_NAME: ${{ secrets.GKE_CLUSTER_NAME }}"
-                  echo "GKE_REGION: ${{ secrets.GKE_REGION }}"
-                  echo "DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}"
-                  echo "DOCKER_PASSWORD: [nascosto]"
-                  echo "GCP_SA_KEY: [secret provided, length hidden]"
+                  sudo apt-get update && \
+                  sudo apt-get install -y google-cloud-sdk-gke-gcloud-auth-plugin
 
-            - name: Check active account (debug)
+            - name: Check active account
               run: gcloud auth list
 
             - name: Get GKE credentials
@@ -63,10 +59,6 @@ jobs:
                   gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER_NAME }} \
                     --region ${{ secrets.GKE_REGION }}
 
-            - name: Install gke-gcloud-auth-plugin
-              run: |
-                  sudo apt-get update && sudo apt-get install -y google-cloud-sdk-gke-gcloud-auth-plugin
-
-            - name: Update deployment
+            - name: Update Kubernetes Deployment
               run: |
                   kubectl set image deployment/$SERVICE_NAME $SERVICE_NAME=$IMAGE_NAME:${{ github.sha }}
