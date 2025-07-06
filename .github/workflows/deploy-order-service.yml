@@ -34,25 +34,13 @@ jobs:
                     -t $IMAGE_NAME:${{ github.sha }} \
                     --push ./order_service
 
-            - name: Authenticate to Google Cloud
-              uses: google-github-actions/auth@v2
+            - name: Auth + Get GKE Credentials
+              uses: google-github-actions/get-gke-credentials@v1
               with:
-                  credentials_json: ${{ secrets.GCP_SA_KEY }}
-
-            - name: Setup Google Cloud SDK
-              uses: google-github-actions/setup-gcloud@v2
-              with:
+                  credentials: ${{ secrets.GCP_SA_KEY }}
+                  cluster_name: ${{ secrets.GKE_CLUSTER_NAME }}
+                  location: ${{ secrets.GKE_REGION }}
                   project_id: ${{ secrets.GCP_PROJECT_ID }}
-
-            - name: Install GKE Auth Plugin
-              run: |
-                  sudo apt-get update && \
-                  sudo apt-get install -y google-cloud-sdk-gke-gcloud-auth-plugin
-
-            - name: Get GKE credentials
-              run: |
-                  gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER_NAME }} \
-                    --region ${{ secrets.GKE_REGION }}
 
             - name: Update Kubernetes Deployment
               run: |
