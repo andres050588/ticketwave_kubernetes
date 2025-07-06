@@ -41,7 +41,7 @@ jobs:
                   service_account_key: ${{ secrets.GCP_SA_KEY }}
                   export_default_credentials: true
 
-            - name: Check active account
+            - name: Check active account (debug)
               run: gcloud auth list
 
             - name: Get GKE credentials
